@@ -26,7 +26,7 @@ import { API_BASE_URL } from '../../../config';
 
 // ----------------------------------------------------------------------
 
-export default function Nav({ openNav, onCloseNav }) {
+export default function Nav({ openNav, onCloseNav, accountInfo }) {
   const pathname = usePathname();
 
   const upLg = useResponsive('up', 'lg');
@@ -34,42 +34,17 @@ export default function Nav({ openNav, onCloseNav }) {
   const [account, setAccount] = useState({});
 
   useEffect(() => {
-    if (openNav) {
-      onCloseNav();
-    }
-    const token = localStorage.getItem('jwttoken');
-    const fetchAccountInfo = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/Account/accountInfo`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`, // Replace with your actual access token
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setAccount({
-            displayName: data.name,
-            role: data.role === true ? 'Admin' : 'User',
-            photoURL: '', // Set the photoURL if available, or leave it empty for now
-          });
-        } else {
-          // Handle error
-          console.error('Error fetching account info:', response.statusText);
-        }
-      } catch (error) {
-        // Handle error
-        console.error('Error fetching account info:', error.message);
-      }
-    };
-
-    fetchAccountInfo();
+    // if (openNav) {
+    //   onCloseNav();
+    // }
+    console.log('Account Info:', accountInfo);
+    setAccount({
+      displayName: accountInfo.name,
+      role: accountInfo.role === true ? 'Admin' : 'User',
+      photoURL: '', // Set the photoURL if available, or leave it empty for now
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, openNav]);
-
-  
 
   const renderAccount = (
     <Box
@@ -84,13 +59,13 @@ export default function Nav({ openNav, onCloseNav }) {
         bgcolor: (theme) => alpha(theme.palette.grey[500], 0.12),
       }}
     >
-      <Avatar src={account.photoURL} alt="photoURL" />
+      <Avatar src={accountInfo.photoURL} alt="photoURL" />
 
       <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2">{account.displayName}</Typography>
+        <Typography variant="subtitle2">{accountInfo.displayName}</Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {account.role}
+          {accountInfo.role}
         </Typography>
       </Box>
     </Box>
@@ -103,7 +78,6 @@ export default function Nav({ openNav, onCloseNav }) {
       ))}
     </Stack>
   );
-
 
   const renderContent = (
     <Scrollbar
@@ -164,6 +138,7 @@ export default function Nav({ openNav, onCloseNav }) {
 Nav.propTypes = {
   openNav: PropTypes.bool,
   onCloseNav: PropTypes.func,
+  accountInfo: PropTypes.object.isRequired,
 };
 
 // ----------------------------------------------------------------------
